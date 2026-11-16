@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TECHMG · Resource Hub</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+
+    :root {
+      --bg-body: #f4f6fc; --bg-surface: #ffffff; --bg-card: #ffffff; --bg-elevated: #ffffff;
+      --text-primary: #0b0f19; --text-secondary: #4a5568; --text-muted: #718096;
+      --border-light: #e2e8f0; --accent: #6d28d9; --accent-hover: #7c3aed;
+      --accent-glow: rgba(109, 40, 217, 0.25);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06); --shadow-md: 0 8px 20px -6px rgba(0,0,0,0.08);
+      --shadow-lg: 0 20px 35px -10px rgba(109,40,217,0.15);
+      --radius: 20px; --radius-sm: 14px; --radius-xs: 10px;
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      --step-bg: #f8fafc; --code-bg: #f1f5f9; --modal-overlay: rgba(0,0,0,0.5);
+      --input-bg: #ffffff; --tab-inactive: #edf2f7;
+      --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
+    }
+    body.dark {
+      --bg-body: #070b14; --bg-surface: #0f1729; --bg-card: #131d31; --bg-elevated: #1a2740;
+      --text-primary: #f1f5f9; --text-secondary: #94a3b8; --text-muted: #64748b;
+      --border-light: #1e2d4a; --accent: #a78bfa; --accent-hover: #c4b5fd;
+      --accent-glow: rgba(167,139,250,0.15);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.4); --shadow-md: 0 8px 20px -6px rgba(0,0,0,0.5);
+      --shadow-lg: 0 20px 35px -10px rgba(167,139,250,0.12);
+      --step-bg: #0b1322; --code-bg: #0a0f1c; --modal-overlay: rgba(0,0,0,0.8);
+      --input-bg: #0b1322; --tab-inactive: #1a2740;
+    }
+    body {
+      background: var(--bg-body); color: var(--text-primary); min-height: 100vh;
+      transition: background 0.3s, color 0.25s; padding: 1.5rem;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .app { max-width: 1400px; width: 100%; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-body); }
+    ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+      padding-bottom: 1.25rem; border-bottom: 1px solid var(--border-light);
+    }
+    .brand { display: flex; align-items: center; gap: 0.7rem; }
+    .brand-icon {
+      width: 44px; height: 44px; border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), #c084fc);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 1.4rem; box-shadow: 0 8px 18px -6px var(--accent-glow);
+    }
+    .brand h1 {
+      font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--accent), #c084fc);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .brand span { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.15em; text-transform: uppercase; }
+    .header-actions { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .btn {
+      border: none; border-radius: 40px; font-weight: 600; font-size: 0.9rem;
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      cursor: pointer; transition: var(--transition); padding: 0.7rem 1.3rem;
+      background: var(--bg-card); color: var(--text-primary);
+      border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);
+    }
+    .btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn-accent { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 6px 16px -4px var(--accent-glow); }
+    .btn-accent:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: white; }
+    .btn-icon { width: 42px; height: 42px; padding: 0; border-radius: 50%; font-size: 1.1rem; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .toolbar { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 1.5rem; align-items: center; }
+    .search-wrap { flex: 1; min-width: 220px; position: relative; }
+    .search-wrap i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.95rem; }
+    .search-input {
+      width: 100%; padding: 0.8rem 1rem 0.8rem 2.8rem;
+      background: var(--input-bg); border: 1px solid var(--border-light);
+      border-radius: 40px; font-size: 0.95rem; color: var(--text-primary);
+      transition: var(--transition); outline: none;
+    }
+    .search-input::placeholder { color: var(--text-muted); }
+    .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .filter-select {
+      padding: 0.8rem 2.5rem 0.8rem 1.2rem; background: var(--input-bg);
+      border: 1px solid var(--border-light); border-radius: 40px;
+      font-size: 0.9rem; color: var(--text-primary); cursor: pointer;
+      outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23718096' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 1.2rem center;
+      transition: var(--transition);
+    }
+    .filter-select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+    .tabs { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.8rem; }
+    .tab-btn {
+      background: transparent; border: 1px solid transparent;
+      padding: 0.65rem 1.5rem; border-radius: 40px; font-size: 0.95rem;
+      font-weight: 600; color: var(--text-secondary); cursor: pointer;
+      transition: var(--transition); display: flex; align-items: center; gap: 0.5rem;
+    }
+    .tab-btn i { font-size: 0.95rem; }
+    .tab-btn:hover { background: var(--bg-card); color: var(--text-primary); border-color: var(--border-light); }
+    .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 6px 16px -4px var(--accent-glow); }
+
+    .panel { display: none; animation: fadeUp 0.3s ease; }
+    .panel.active { display: block; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 1.6rem; margin-bottom: 2rem; }
+    .card {
+      background: var(--bg-card); border-radius: var(--radius);
+      padding: 1.6rem; border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-sm); transition: var(--transition);
+      display: flex; flex-direction: column; position: relative;
+      animation: fadeUp 0.35s ease;
+    }
+    .card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); border-color: var(--accent); }
+    .card-badge {
+      position: absolute; top: 1.2rem; right: 1.2rem;
+      font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; padding: 0.3rem 0.7rem; border-radius: 30px;
+      background: var(--tab-inactive); color: var(--text-secondary);
+    }
+    .card-badge.pdf { background: #fee2e2; color: #b91c1c; }
+    body.dark .card-badge.pdf { background: #3b1e1e; color: #fca5a5; }
+    .card-badge.prompt { background: #ede9fe; color: #6d28d9; }
+    body.dark .card-badge.prompt { background: #2a1e4a; color: #c4b5fd; }
+    .card-badge.link { background: #dbeafe; color: #1d4ed8; }
+    body.dark .card-badge.link { background: #1e2a4a; color: #93c5fd; }
+    .card-badge.tutorial { background: #d1fae5; color: #047857; }
+    body.dark .card-badge.tutorial { background: #1a3a2e; color: #6ee7b7; }
+    .card-badge.file { background: #fef3c7; color: #b45309; }
+    body.dark .card-badge.file { background: #3b2e1e; color: #fcd34d; }
+
+    .card-icon {
+      width: 52px; height: 52px; border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; margin-bottom: 1rem;
+      background: var(--tab-inactive); color: var(--accent);
+    }
+    .card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.4rem; line-height: 1.3; }
+    .card p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; margin-bottom: 1rem; flex: 1; }
+    .card-footer { display: flex; gap: 0.6rem; align-items: center; margin-top: auto; flex-wrap: wrap; }
+
+    .btn-sm {
+      padding: 0.55rem 1rem; font-size: 0.8rem; border-radius: 30px;
+      border: 1px solid var(--border-light); background: transparent;
+      color: var(--text-primary); cursor: pointer; font-weight: 600;
+      transition: var(--transition); display: inline-flex; align-items: center; gap: 0.4rem;
+    }
+    .btn-sm:hover { background: var(--accent); color: white; border-color: var(--accent); }
+    .btn-sm.primary { background: var(--accent); color: white; border-color: var(--accent); }
+    .btn-sm.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+    .bookmark-btn {
+      background: transparent; border: none; color: var(--text-muted);
+      font-size: 1.1rem; cursor: pointer; transition: var(--transition);
+      padding: 0.4rem; border-radius: 50%; width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .bookmark-btn:hover { color: var(--accent); background: var(--tab-inactive); }
+    .bookmark-btn.bookmarked { color: var(--accent); }
+    .bookmark-btn.bookmarked i { font-weight: 900; }
+
+    .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+    .empty-state i { font-size: 3rem; opacity: 0.4; }
+    .empty-state h3 { font-size: 1.3rem; color: var(--text-secondary); }
+    .empty-state p { max-width: 400px; line-height: 1.6; }
+
+    .modal-overlay {
+      position: fixed; inset: 0; background: var(--modal-overlay);
+      backdrop-filter: blur(4px); display: none; align-items: center;
+      justify-content: center; z-index: 1000; padding: 1.5rem;
+      animation: fadeIn 0.2s ease;
+    }
+    .modal-overlay.open { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal {
+      background: var(--bg-surface); border-radius: var(--radius);
+      max-width: 620px; width: 100%; max-height: 88vh; overflow-y: auto;
+      box-shadow: var(--shadow-lg); border: 1px solid var(--border-light);
+      animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.5rem 1.8rem; border-bottom: 1px solid var(--border-light);
+      position: sticky; top: 0; background: var(--bg-surface); z-index: 2;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .modal-header h2 { font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 0.6rem; }
+    .modal-close {
+      background: transparent; border: none; color: var(--text-muted);
+      font-size: 1.2rem; cursor: pointer; width: 36px; height: 36px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      transition: var(--transition);
+    }
+    .modal-close:hover { background: var(--tab-inactive); color: var(--text-primary); }
+    .modal-body { padding: 1.8rem; }
+
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; padding: 0.8rem 1rem; background: var(--input-bg);
+      border: 1px solid var(--border-light); border-radius: var(--radius-xs);
+      font-size: 0.95rem; color: var(--text-primary); font-family: inherit;
+      transition: var(--transition); outline: none;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-group input[type="file"] { padding: 0.6rem; font-size: 0.85rem; }
+    .form-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; }
+
+    .file-drop {
+      border: 2px dashed var(--border-light); border-radius: var(--radius-sm);
+      padding: 2rem 1rem; text-align: center; cursor: pointer;
+      transition: var(--transition); background: var(--step-bg);
+    }
+    .file-drop:hover, .file-drop.dragover { border-color: var(--accent); background: var(--accent-glow); }
+    .file-drop i { font-size: 2rem; color: var(--accent); margin-bottom: 0.5rem; display: block; }
+    .file-drop p { color: var(--text-secondary); font-size: 0.9rem; }
+    .file-drop strong { color: var(--accent); }
+    .file-selected {
+      margin-top: 0.8rem; padding: 0.8rem; background: var(--step-bg);
+      border-radius: var(--radius-xs); display: flex; align-items: center;
+      gap: 0.6rem; font-size: 0.85rem; border: 1px solid var(--border-light);
+    }
+    .file-selected i { color: var(--accent); font-size: 1.1rem; }
+    .file-selected .remove-file { margin-left: auto; background: transparent; border: none; color: var(--danger); cursor: pointer; font-size: 0.9rem; padding: 0.3rem; }
+
+    .upload-progress { margin-top: 0.6rem; height: 6px; background: var(--border-light); border-radius: 10px; overflow: hidden; display: none; }
+    .upload-progress.active { display: block; }
+    .upload-progress-bar { height: 100%; width: 0%; background: var(--accent); transition: width 0.2s ease; border-radius: 10px; }
+
+    .step-input-row { display: flex; gap: 0.6rem; margin-bottom: 0.6rem; align-items: flex-start; }
+    .step-input-row input { flex: 1; }
+    .step-input-row button {
+      background: transparent; border: none; color: var(--danger);
+      cursor: pointer; font-size: 1rem; padding: 0.7rem; border-radius: 50%;
+      transition: var(--transition); flex-shrink: 0;
+    }
+    .step-input-row button:hover { background: #fee2e2; }
+    body.dark .step-input-row button:hover { background: #3b1e1e; }
+
+    .add-step-btn {
+      background: transparent; border: 1px dashed var(--border-light);
+      color: var(--text-secondary); padding: 0.6rem 1rem; border-radius: var(--radius-xs);
+      font-size: 0.85rem; font-weight: 600; cursor: pointer; width: 100%;
+      transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+    }
+    .add-step-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .modal-footer {
+      display: flex; justify-content: flex-end; gap: 0.8rem;
+      padding: 1.2rem 1.8rem; border-top: 1px solid var(--border-light);
+      position: sticky; bottom: 0; background: var(--bg-surface);
+      border-radius: 0 0 var(--radius) var(--radius);
+    }
+
+    .steps-list { display: flex; flex-direction: column; gap: 0.7rem; }
+    .step-item {
+      background: var(--step-bg); border-radius: var(--radius-sm);
+      padding: 1rem 1.2rem; display: flex; gap: 0.9rem; align-items: flex-start;
+      border-left: 3px solid var(--accent);
+    }
+    .step-num { background: var(--accent); color: white; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0; }
+    .step-text { flex: 1; line-height: 1.5; font-size: 0.95rem; }
+    .step-text code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--accent); border: 1px solid var(--border-light); }
+
+    .resource-meta { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1.2rem; padding-bottom: 1.2rem; border-bottom: 1px solid var(--border-light); }
+    .meta-pill {
+      font-size: 0.75rem; font-weight: 600; padding: 0.3rem 0.8rem;
+      border-radius: 30px; background: var(--tab-inactive); color: var(--text-secondary);
+      display: inline-flex; align-items: center; gap: 0.4rem;
+    }
+
+    .admin-toolbar {
+      display: flex; gap: 0.6rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+      padding: 1rem; background: var(--bg-card); border-radius: var(--radius-sm);
+      border: 1px solid var(--border-light);
+    }
+    .admin-toolbar .btn-accent { margin-left: auto; }
+
+    .sync-status {
+      margin-bottom: 1rem; padding: 0.7rem 1rem;
+      border-radius: var(--radius-sm); font-size: 0.85rem;
+      border: 1px solid var(--border-light); background: var(--bg-card);
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .sync-status.syncing { border-color: var(--warning); color: var(--warning); }
+    .sync-status.error { border-color: var(--danger); color: var(--danger); }
+    .sync-status.success { border-color: var(--success); color: var(--success); }
+    .sync-status .spinner { animation: spin 1s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    .toast {
+      position: fixed; bottom: 2rem; right: 2rem; background: var(--bg-elevated);
+      color: var(--text-primary); padding: 1rem 1.5rem; border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-lg); border: 1px solid var(--border-light);
+      display: flex; align-items: center; gap: 0.8rem; z-index: 2000;
+      transform: translateY(150%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      max-width: 380px; font-size: 0.9rem;
+    }
+    .toast.show { transform: translateY(0); }
+    .toast i { font-size: 1.2rem; color: var(--success); }
+    .toast.error i { color: var(--danger); }
+
+    .login-box {
+      max-width: 400px; margin: 4rem auto; background: var(--bg-card);
+      padding: 2.5rem; border-radius: var(--radius); border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-lg); text-align: center;
+    }
+    .login-box i { font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem; }
+    .login-box h2 { margin-bottom: 0.5rem; }
+    .login-box p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .login-box input { width: 100%; margin-bottom: 1rem; }
+    .login-box .btn-accent { width: 100%; }
+
+    .security-note {
+      margin-top: 1rem; padding: 0.8rem; background: var(--step-bg);
+      border-radius: var(--radius-xs); font-size: 0.78rem; color: var(--text-muted);
+      line-height: 1.5; text-align: left;
+    }
+
+    .config-warning {
+      max-width: 700px; margin: 2rem auto; padding: 1.5rem;
+      background: #fef3c7; border: 2px solid #f59e0b; border-radius: var(--radius);
+      color: #78350f; font-size: 0.95rem; line-height: 1.6;
+    }
+    body.dark .config-warning { background: #3b2e1e; border-color: #b45309; color: #fcd34d; }
+    .config-warning h3 { margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.5rem; }
+    .config-warning code { background: rgba(0,0,0,0.1); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem; }
+    body.dark .config-warning code { background: rgba(0,0,0,0.3); }
+
+    @media (max-width: 700px) {
+      body { padding: 1rem; }
+      .brand h1 { font-size: 1.4rem; }
+      .brand-icon { width: 36px; height: 36px; font-size: 1.1rem; border-radius: 10px; }
+      .card-grid { grid-template-columns: 1fr; gap: 1.2rem; }
+      .tab-btn { padding: 0.55rem 1rem; font-size: 0.85rem; }
+      .btn { padding: 0.6rem 1rem; font-size: 0.85rem; }
+      .toolbar { gap: 0.6rem; }
+      .modal { max-height: 92vh; }
+      .modal-header, .modal-body, .modal-footer { padding: 1.2rem; }
+      .toast { bottom: 1rem; right: 1rem; left: 1rem; max-width: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="brand">
+      <div class="brand-icon"><i class="fas fa-bolt"></i></div>
+      <div>
+        <h1>TECHMG</h1>
+        <span>Resource Hub</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn" id="themeToggle" title="Toggle theme">
+        <i class="fas fa-moon" id="themeIcon"></i>
+      </button>
+      <button class="btn" id="adminToggle" title="Admin panel">
+        <i class="fas fa-user-shield"></i> <span id="adminLabel">Admin</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Config warning (hidden once configured) -->
+  <div id="configWarning" class="config-warning" style="display:none;">
+    <h3><i class="fas fa-exclamation-triangle"></i> GitHub Sync Not Configured</h3>
+    <p>The site is running in <strong>local-only mode</strong>. Changes will NOT sync across devices. To enable cross-device sync, edit the <code>GITHUB_CONFIG</code> object at the top of the script and fill in your repo details and token. See the comments in the code for step-by-step instructions.</p>
+  </div>
+
+  <div id="publicView">
+    <div class="toolbar">
+      <div class="search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search resources..." />
+      </div>
+      <select class="filter-select" id="filterSelect">
+        <option value="all">All types</option>
+        <option value="pdf">PDFs</option>
+        <option value="prompt">Prompts</option>
+        <option value="link">Links</option>
+        <option value="tutorial">Tutorials</option>
+        <option value="file">Files & Archives</option>
+      </select>
+      <select class="filter-select" id="sortSelect">
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
+        <option value="az">A → Z</option>
+      </select>
+      <button class="btn btn-icon" id="bookmarkFilterBtn" title="Show bookmarks only">
+        <i class="far fa-bookmark"></i>
+      </button>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" data-tab="all"><i class="fas fa-layer-group"></i> All</button>
+      <button class="tab-btn" data-tab="pdf"><i class="fas fa-file-pdf"></i> PDFs</button>
+      <button class="tab-btn" data-tab="prompt"><i class="fas fa-terminal"></i> Prompts</button>
+      <button class="tab-btn" data-tab="link"><i class="fas fa-link"></i> Links</button>
+      <button class="tab-btn" data-tab="tutorial"><i class="fas fa-graduation-cap"></i> Tutorials</button>
+      <button class="tab-btn" data-tab="file"><i class="fas fa-file-archive"></i> Files</button>
+    </div>
+
+    <div id="all" class="panel active">
+      <div class="card-grid" id="publicGrid"></div>
+    </div>
+  </div>
+
+  <div id="adminView" style="display:none;">
+    <div id="adminLogin" class="login-box">
+      <i class="fas fa-lock"></i>
+      <h2>Admin Access</h2>
+      <p>Enter your admin password to manage resources.</p>
+      <input type="password" class="search-input" id="adminPassword" placeholder="Admin password" autocomplete="off" />
+      <div class="security-note">
+        <i class="fas fa-shield-alt"></i> <strong>Security:</strong> Password verified via SHA-256. 5 failed attempts locks login for 60 seconds.
+      </div>
+      <button class="btn btn-accent" id="loginBtn" style="width:100%; margin-top:1rem;">
+        <i class="fas fa-arrow-right"></i> Unlock Dashboard
+      </button>
+      <div id="loginStatus" class="form-hint" style="margin-top:0.8rem; text-align:center;"></div>
+    </div>
+
+    <div id="adminDashboard" style="display:none;">
+      <div class="sync-status" id="syncStatus" style="display:none;">
+        <i class="fas fa-circle-notch spinner"></i>
+        <span id="syncStatusText">Syncing with GitHub...</span>
+      </div>
+
+      <div class="admin-toolbar">
+        <button class="btn btn-accent" id="addResourceBtn">
+          <i class="fas fa-plus"></i> Add Resource
+        </button>
+        <button class="btn" id="refreshBtn"><i class="fas fa-sync"></i> Refresh from GitHub</button>
+        <button class="btn" id="logoutBtn" style="margin-left:auto;"><i class="fas fa-sign-out-alt"></i> Exit</button>
+      </div>
+
+      <div id="adminResourceCount" style="margin-bottom:1.2rem; color:var(--text-secondary); font-size:0.9rem;"></div>
+      <div id="adminGrid" class="card-grid"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="resourceModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle"><i class="fas fa-plus-circle" style="color:var(--accent);"></i> Add Resource</h2>
+        <button class="modal-close" id="closeModalBtn"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="resourceForm">
+          <div class="form-group">
+            <label>Resource type</label>
+            <select id="fieldType" required>
+              <option value="pdf">📄 PDF</option>
+              <option value="prompt">⌨️ Prompt</option>
+              <option value="link">🔗 Link</option>
+              <option value="tutorial">🎓 Tutorial</option>
+              <option value="file">📦 File / Archive</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="fieldTitle" placeholder="e.g. Prompt Engineering Pack (ZIP)" required />
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="fieldDesc" placeholder="Short description of this resource..." required></textarea>
+          </div>
+          <div class="form-group" id="urlGroup">
+            <label id="urlLabel">URL / Download link</label>
+            <input type="url" id="fieldUrl" placeholder="https://..." />
+            <div class="form-hint" id="urlHint">Paste a link (Google Drive, Dropbox, etc.). <strong>Required for cross-device files.</strong></div>
+          </div>
+          <div class="form-group" id="fileGroup" style="display:none;">
+            <label>Upload file (browser-local preview only)</label>
+            <div class="file-drop" id="fileDrop">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <p><strong>Click to upload</strong> or drag & drop</p>
+              <p style="font-size:0.8rem; margin-top:0.3rem;" id="fileAcceptHint">Any file type</p>
+            </div>
+            <input type="file" id="fieldFile" style="display:none;" />
+            <div id="fileSelectedInfo"></div>
+            <div class="form-hint" style="margin-top:0.5rem;">
+              <i class="fas fa-exclamation-triangle" style="color:var(--warning);"></i>
+              Files uploaded here stay in <strong>this browser only</strong>. For cross-device access, upload the file to Google Drive / Dropbox and paste the share link above.
+            </div>
+          </div>
+          <div class="form-group" id="contentGroup" style="display:none;">
+            <label>Prompt / Tutorial content</label>
+            <textarea id="fieldContent" placeholder="Paste the full prompt text or tutorial content here..." rows="4"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Step-by-step instructions</label>
+            <div id="stepsContainer"></div>
+            <button type="button" class="add-step-btn" id="addStepBtn"><i class="fas fa-plus"></i> Add step</button>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" id="cancelModalBtn">Cancel</button>
+        <button class="btn btn-accent" id="saveResourceBtn"><i class="fas fa-check"></i> Save & Sync</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="stepsModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="stepsModalTitle"><i class="fas fa-list-ol" style="color:var(--accent);"></i> How to use</h2>
+        <button class="modal-close" id="closeStepsBtn"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" id="stepsModalBody"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <i class="fas fa-check-circle" id="toastIcon"></i>
+    <span id="toastMsg">Done</span>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ============================================================
+  //  ★★★ GITHUB SYNC CONFIG — FILL THESE IN ★★★
+  // ============================================================
+  // STEP 1: Create a GitHub Personal Access Token with `repo` scope.
+  //         https://github.com/settings/tokens
+  // STEP 2: Create a repo (or reuse yours) with a `data.json` file.
+  //         Initial content: {"resources":[],"version":1}
+  // STEP 3: Fill in the values below. Leave TOKEN as '' to disable sync.
+  // STEP 4: Push the updated HTML to GitHub Pages.
+  //
+  // ⚠️ WARNING: The token is visible in this HTML file to anyone who
+  //    views the source. Use a dedicated repo with a fine-grained token
+  //    that only has "Contents: Read & Write" on that single repo.
+  //    Rotate the token if it leaks.
+  // ============================================================
+  const GITHUB_CONFIG = {
+    owner: 'mahakaleshwar2105',            // e.g. 'yourusername'
+    repo: 'TechMG',             // e.g. 'techmg-data'
+    path: 'data.json',    // file path in repo
+    branch: 'main',       // branch name
+    token: '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'             // your PAT (starts with 'ghp_' or 'github_pat_')
+  };
+
+  const SYNC_ENABLED = !!(GITHUB_CONFIG.owner && GITHUB_CONFIG.repo && GITHUB_CONFIG.token);
+
+  // ============================================================
+  //  ADMIN AUTH
+  // ============================================================
+  const FIRST_RUN_PASSWORD = 'MAha@210511';
+  async function sha256(str) {
+    const enc = new TextEncoder();
+    const buf = await crypto.subtle.digest('SHA-256', enc.encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  async function ensureAdminHash() {
+    const stored = localStorage.getItem('techmg_admin_hash');
+    if (stored) return stored;
+    const hash = await sha256(FIRST_RUN_PASSWORD);
+    localStorage.setItem('techmg_admin_hash', hash);
+    return hash;
+  }
+  async function verifyPassword(input) {
+    const storedHash = await ensureAdminHash();
+    return (await sha256(input)) === storedHash;
+  }
+
+  // ============================================================
+  //  INDEXEDDB — for local file blobs (browser only)
+  // ============================================================
+  const DB_NAME = 'techmg_files_db';
+  const DB_VERSION = 1;
+  const STORE_FILES = 'files';
+  let dbPromise = null;
+  function openDB() {
+    if (dbPromise) return dbPromise;
+    dbPromise = new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE_FILES)) db.createObjectStore(STORE_FILES, { keyPath: 'id' });
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+    return dbPromise;
+  }
+  async function saveFileToDB(id, blob, meta) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_FILES, 'readwrite');
+      tx.objectStore(STORE_FILES).put({ id, blob, meta: meta || {} });
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+  async function getFileFromDB(id) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_FILES, 'readonly');
+      const req = tx.objectStore(STORE_FILES).get(id);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  async function deleteFileFromDB(id) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_FILES, 'readwrite');
+      tx.objectStore(STORE_FILES).delete(id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  // ============================================================
+  //  GITHUB SYNC
+  // ============================================================
+  const GITHUB_API = 'https://api.github.com';
+  let syncInProgress = false;
+  let lastSha = null;
+
+  function showSyncStatus(msg, type) {
+    const el = document.getElementById('syncStatus');
+    const txt = document.getElementById('syncStatusText');
+    if (!el) return;
+    if (!msg) { el.style.display = 'none'; return; }
+    el.style.display = 'flex';
+    el.className = 'sync-status ' + (type || '');
+    txt.textContent = msg;
+  }
+
+  async function githubFetch(path, options) {
+    const url = `${GITHUB_API}/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`;
+    const res = await fetch(url, {
+      ...options,
+      headers: {
+        'Authorization': `token ${GITHUB_CONFIG.token}`,
+        'Accept': 'application/vnd.github+json',
+        ...(options && options.headers ? options.headers : {})
+      }
+    });
+    return res;
+  }
+
+  // Load data.json from GitHub
+  async function loadFromGitHub() {
+    if (!SYNC_ENABLED) return null;
+    try {
+      const res = await githubFetch(`${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}`, { method: 'GET' });
+      if (!res.ok) {
+        console.warn('GitHub load failed', res.status);
+        return null;
+      }
+      const json = await res.json();
+      lastSha = json.sha;
+      const content = atob(json.content.replace(/\s/g, ''));
+      const data = JSON.parse(content);
+      return data;
+    } catch (e) {
+      console.warn('GitHub load error', e);
+      return null;
+    }
+  }
+
+  // Save data.json to GitHub (commit via API)
+  async function saveToGitHub(data) {
+    if (!SYNC_ENABLED) return false;
+    if (syncInProgress) { showToast('Sync already in progress', true); return false; }
+    syncInProgress = true;
+    showSyncStatus('Saving to GitHub...', 'syncing');
+    try {
+      // Get latest SHA first
+      const getRes = await githubFetch(`${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}`, { method: 'GET' });
+      let sha = null;
+      if (getRes.ok) {
+        const j = await getRes.json();
+        sha = j.sha;
+      }
+      const body = {
+        message: `TECHMG update — ${new Date().toISOString()}`,
+        content: btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))),
+        branch: GITHUB_CONFIG.branch
+      };
+      if (sha) body.sha = sha;
+      const putRes = await githubFetch(GITHUB_CONFIG.path, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!putRes.ok) {
+        const err = await putRes.text();
+        throw new Error(`GitHub save failed (${putRes.status}): ${err}`);
+      }
+      const result = await putRes.json();
+      lastSha = result.content.sha;
+      showSyncStatus('Synced ✓', 'success');
+      setTimeout(() => showSyncStatus('', ''), 2000);
+      showToast('Saved & synced to all devices');
+      return true;
+    } catch (e) {
+      console.error(e);
+      showSyncStatus('Sync failed: ' + e.message, 'error');
+      showToast('Sync failed: ' + e.message, true);
+      return false;
+    } finally {
+      syncInProgress = false;
+    }
+  }
+
+  // ============================================================
+  //  STATE
+  // ============================================================
+  let resources = [];
+  let bookmarks = new Set();
+  let isAdmin = false;
+  let editingId = null;
+  let currentFilter = 'all';
+  let currentSearch = '';
+  let currentSort = 'newest';
+  let showBookmarksOnly = false;
+  let pendingFile = null;
+
+  const STORAGE_KEY = 'techmg_resources_v1';
+  const BOOKMARK_KEY = 'techmg_bookmarks_v1';
+  const THEME_KEY = 'techmg_theme';
+  const FAIL_KEY = 'techmg_login_fails';
+  const LOCK_KEY = 'techmg_lock_until';
+  const MAX_ATTEMPTS = 5;
+  const LOCK_DURATION_MS = 60 * 1000;
+  const WARN_SIZE = 500 * 1024 * 1024;
+
+  // ============================================================
+  //  DOM REFS
+  // ============================================================
+  const $ = (id) => document.getElementById(id);
+  const publicGrid = $('publicGrid');
+  const adminGrid = $('adminGrid');
+  const searchInput = $('searchInput');
+  const filterSelect = $('filterSelect');
+  const sortSelect = $('sortSelect');
+  const bookmarkFilterBtn = $('bookmarkFilterBtn');
+  const themeToggle = $('themeToggle');
+  const themeIcon = $('themeIcon');
+  const adminToggle = $('adminToggle');
+  const adminLabel = $('adminLabel');
+  const publicView = $('publicView');
+  const adminView = $('adminView');
+  const adminLogin = $('adminLogin');
+  const adminDashboard = $('adminDashboard');
+  const adminPassword = $('adminPassword');
+  const loginBtn = $('loginBtn');
+  const loginStatus = $('loginStatus');
+  const addResourceBtn = $('addResourceBtn');
+  const refreshBtn = $('refreshBtn');
+  const logoutBtn = $('logoutBtn');
+  const adminResourceCount = $('adminResourceCount');
+  const configWarning = $('configWarning');
+
+  const resourceModal = $('resourceModal');
+  const modalTitle = $('modalTitle');
+  const closeModalBtn = $('closeModalBtn');
+  const cancelModalBtn = $('cancelModalBtn');
+  const saveResourceBtn = $('saveResourceBtn');
+  const fieldType = $('fieldType');
+  const fieldTitle = $('fieldTitle');
+  const fieldDesc = $('fieldDesc');
+  const fieldUrl = $('fieldUrl');
+  const fieldFile = $('fieldFile');
+  const fieldContent = $('fieldContent');
+  const urlGroup = $('urlGroup');
+  const fileGroup = $('fileGroup');
+  const contentGroup = $('contentGroup');
+  const urlLabel = $('urlLabel');
+  const urlHint = $('urlHint');
+  const fileDrop = $('fileDrop');
+  const fileAcceptHint = $('fileAcceptHint');
+  const fileSelectedInfo = $('fileSelectedInfo');
+  const stepsContainer = $('stepsContainer');
+  const addStepBtn = $('addStepBtn');
+
+  const stepsModal = $('stepsModal');
+  const stepsModalTitle = $('stepsModalTitle');
+  const stepsModalBody = $('stepsModalBody');
+  const closeStepsBtn = $('closeStepsBtn');
+
+  const toast = $('toast');
+  const toastIcon = $('toastIcon');
+  const toastMsg = $('toastMsg');
+
+  // ============================================================
+  //  UTILITIES
+  // ============================================================
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+  }
+  function showToast(msg, isError) {
+    toastMsg.textContent = msg;
+    toastIcon.className = isError ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+    toast.classList.toggle('error', !!isError);
+    toast.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove('show'), 3500);
+  }
+  function formatBytes(bytes) {
+    if (!bytes) return '0 B';
+    const k = 1024, sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
+  }
+  function detectFileKind(filename) {
+    if (!filename) return 'file';
+    const ext = filename.split('.').pop().toLowerCase();
+    if (ext === 'pdf') return 'pdf';
+    if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) return 'archive';
+    if (['doc', 'docx', 'txt', 'rtf', 'odt'].includes(ext)) return 'doc';
+    if (['xls', 'xlsx', 'csv', 'ods'].includes(ext)) return 'sheet';
+    if (['ppt', 'pptx', 'odp'].includes(ext)) return 'slides';
+    if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp'].includes(ext)) return 'image';
+    if (['mp4', 'mov', 'webm', 'avi', 'mkv'].includes(ext)) return 'video';
+    if (['mp3', 'wav', 'ogg', 'flac', 'm4a'].includes(ext)) return 'audio';
+    if (['js', 'ts', 'py', 'html', 'css', 'json', 'xml', 'java', 'c', 'cpp', 'go', 'rs', 'sh'].includes(ext)) return 'code';
+    return 'file';
+  }
+  function fileIcon(kind) {
+    return {
+      pdf: 'fa-file-pdf', archive: 'fa-file-archive', doc: 'fa-file-word',
+      sheet: 'fa-file-excel', slides: 'fa-file-powerpoint', image: 'fa-file-image',
+      video: 'fa-file-video', audio: 'fa-file-audio', code: 'fa-file-code', file: 'fa-file'
+    }[kind] || 'fa-file';
+  }
+  function typeIcon(type, fileName) {
+    if ((type === 'file' || type === 'pdf') && fileName) return fileIcon(detectFileKind(fileName));
+    return { pdf: 'fa-file-pdf', prompt: 'fa-terminal', link: 'fa-link', tutorial: 'fa-graduation-cap', file: 'fa-file-archive' }[type] || 'fa-file';
+  }
+  function typeLabel(type) {
+    return { pdf: 'PDF', prompt: 'Prompt', link: 'Link', tutorial: 'Tutorial', file: 'File' }[type] || 'Resource';
+  }
+
+  // ============================================================
+  //  PERSISTENCE — localStorage cache only (source of truth = GitHub)
+  // ============================================================
+  function loadFromLocal() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) resources = parsed;
+      }
+    } catch (e) { console.warn('load failed', e); }
+    if (!resources.length && !SYNC_ENABLED) {
+      resources = seedResources();
+      saveToLocal();
+    }
+    try {
+      const raw = localStorage.getItem(BOOKMARK_KEY);
+      if (raw) { const arr = JSON.parse(raw); if (Array.isArray(arr)) bookmarks = new Set(arr); }
+    } catch (e) { /* ignore */ }
+  }
+  function saveToLocal() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(resources)); } catch (e) { console.warn(e); }
+    try { localStorage.setItem(BOOKMARK_KEY, JSON.stringify([...bookmarks])); } catch (e) { /* ignore */ }
+  }
+  function loadTheme() {
+    if (localStorage.getItem(THEME_KEY) === 'dark') { document.body.classList.add('dark'); themeIcon.className = 'fas fa-sun'; }
+    else { themeIcon.className = 'fas fa-moon'; }
+  }
+  function saveTheme(isDark) { localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light'); }
+
+  // ============================================================
+  //  SEED
+  // ============================================================
+  function seedResources() {
+    const now = Date.now();
+    return [
+      { id: uid(), type: 'prompt', title: 'Chain-of-Thought Generator', description: 'A powerful prompt that makes the AI reason step by step before answering.', url: '', hasFile: false, fileName: null, content: 'Let’s think step by step. Break down the problem into logical parts and explain your reasoning before giving the final answer.', steps: ['Copy the prompt content.', 'Paste it into ChatGPT or Claude.', 'Replace {problem} with your question.', 'Review the reasoning.'], createdAt: now - 86400000 },
+      { id: uid(), type: 'link', title: 'Learn Prompting — Free Course', description: 'Open-source guide with courses and exercises.', url: 'https://learnprompting.org', hasFile: false, fileName: null, content: '', steps: ['Open Learn Prompting.', 'Start with the Basics module.', 'Try the exercises.'], createdAt: now - 86400000 * 2 }
+    ];
+  }
+
+  // ============================================================
+  //  SYNC HELPERS
+  // ============================================================
+  async function syncDown() {
+    if (!SYNC_ENABLED) return false;
+    showSyncStatus('Loading from GitHub...', 'syncing');
+    const data = await loadFromGitHub();
+    if (data && Array.isArray(data.resources)) {
+      resources = data.resources;
+      saveToLocal();
+      showSyncStatus('Loaded ✓', 'success');
+      setTimeout(() => showSyncStatus('', ''), 1500);
+      return true;
+    } else {
+      showSyncStatus('Could not load from GitHub', 'error');
+      return false;
+    }
+  }
+
+  async function syncUp() {
+    if (!SYNC_ENABLED) return false;
+    const ok = await saveToGitHub({ resources, version: 1, updatedAt: new Date().toISOString() });
+    return ok;
+  }
+
+  // ============================================================
+  //  RENDER
+  // ============================================================
+  function getFilteredResources() {
+    let list = [...resources];
+    if (currentFilter !== 'all') list = list.filter(r => r.type === currentFilter);
+    if (currentSearch) {
+      const q = currentSearch.toLowerCase();
+      list = list.filter(r =>
+        (r.title || '').toLowerCase().includes(q) ||
+        (r.description || '').toLowerCase().includes(q) ||
+        (r.content || '').toLowerCase().includes(q) ||
+        (r.fileName || '').toLowerCase().includes(q)
+      );
+    }
+    if (showBookmarksOnly) list = list.filter(r => bookmarks.has(r.id));
+    if (currentSort === 'newest') list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    else if (currentSort === 'oldest') list.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+    else if (currentSort === 'az') list.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+    return list;
+  }
+
+  function renderPublic() {
+    const list = getFilteredResources();
+    if (!list.length) {
+      publicGrid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-inbox"></i><h3>No resources found</h3><p>${showBookmarksOnly ? 'No bookmarks yet.' : 'Try changing your search or filter.'}</p></div>`;
+      return;
+    }
+    publicGrid.innerHTML = list.map(cardHtml).join('');
+    attachCardEvents(publicGrid);
+  }
+
+  function cardHtml(r) {
+    const isBookmarked = bookmarks.has(r.id);
+    const iconClass = typeIcon(r.type, r.fileName);
+    const hasAction = r.url || r.hasFile || r.content;
+    let actionLabel = 'Open', actionIcon = 'fa-external-link-alt';
+    if (r.url) { actionLabel = 'Open'; actionIcon = 'fa-external-link-alt'; }
+    else if (r.hasFile) { actionLabel = 'Download'; actionIcon = 'fa-download'; }
+    else if (r.type === 'prompt' || r.type === 'tutorial') { actionLabel = 'View'; actionIcon = 'fa-code'; }
+
+    return `<div class="card" data-id="${r.id}">
+      <span class="card-badge ${r.type}">${typeLabel(r.type)}</span>
+      <div class="card-icon"><i class="fas ${iconClass}"></i></div>
+      <h3>${escapeHtml(r.title)}</h3>
+      <p>${escapeHtml(r.description)}</p>
+      ${r.fileName ? `<div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.8rem;"><i class="fas fa-paperclip"></i> ${escapeHtml(r.fileName)}${r.fileSize ? ' · ' + formatBytes(r.fileSize) : ''}</div>` : ''}
+      <div class="card-footer">
+        <button class="btn-sm primary view-steps-btn" data-id="${r.id}"><i class="fas fa-eye"></i> How to use</button>
+        ${hasAction ? `<button class="btn-sm open-resource-btn" data-id="${r.id}"><i class="fas ${actionIcon}"></i> ${actionLabel}</button>` : ''}
+        <button class="bookmark-btn ${isBookmarked ? 'bookmarked' : ''}" data-id="${r.id}" title="Bookmark"><i class="${isBookmarked ? 'fas' : 'far'} fa-bookmark"></i></button>
+      </div>
+    </div>`;
+  }
+
+  function attachCardEvents(container) {
+    container.querySelectorAll('.view-steps-btn').forEach(b => b.addEventListener('click', () => openStepsModal(b.dataset.id)));
+    container.querySelectorAll('.open-resource-btn').forEach(b => b.addEventListener('click', () => openResource(b.dataset.id)));
+    container.querySelectorAll('.bookmark-btn').forEach(b => b.addEventListener('click', () => toggleBookmark(b.dataset.id)));
+    container.querySelectorAll('.admin-edit-btn').forEach(b => b.addEventListener('click', () => openEditModal(b.dataset.id)));
+    container.querySelectorAll('.admin-delete-btn').forEach(b => b.addEventListener('click', () => deleteResource(b.dataset.id)));
+  }
+
+  function renderAdmin() {
+    adminResourceCount.textContent = `${resources.length} resource${resources.length !== 1 ? 's' : ''} · ${SYNC_ENABLED ? 'Synced to GitHub' : 'Local only'}`;
+    if (!resources.length) {
+      adminGrid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-plus-circle"></i><h3>No resources yet</h3><p>Click "+ Add Resource" to create your first one.</p></div>`;
+      return;
+    }
+    adminGrid.innerHTML = resources.map(r => `
+      <div class="card" data-id="${r.id}">
+        <span class="card-badge ${r.type}">${typeLabel(r.type)}</span>
+        <div class="card-icon"><i class="fas ${typeIcon(r.type, r.fileName)}"></i></div>
+        <h3>${escapeHtml(r.title)}</h3>
+        <p>${escapeHtml(r.description)}</p>
+        ${r.fileName ? `<div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.8rem;"><i class="fas fa-paperclip"></i> ${escapeHtml(r.fileName)}${r.fileSize ? ' · ' + formatBytes(r.fileSize) : ''}</div>` : ''}
+        <div class="card-footer">
+          <button class="btn-sm primary view-steps-btn" data-id="${r.id}"><i class="fas fa-eye"></i> Steps</button>
+          <button class="btn-sm admin-edit-btn" data-id="${r.id}"><i class="fas fa-pen"></i> Edit</button>
+          <button class="btn-sm admin-delete-btn" data-id="${r.id}" style="color:var(--danger);"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>`).join('');
+    attachCardEvents(adminGrid);
+  }
+
+  function toggleBookmark(id) {
+    if (bookmarks.has(id)) { bookmarks.delete(id); showToast('Bookmark removed'); }
+    else { bookmarks.add(id); showToast('Bookmarked!'); }
+    saveToLocal(); renderPublic();
+  }
+
+  // ============================================================
+  //  OPEN RESOURCE — prefer URL (cross-device), fallback to local blob
+  // ============================================================
+  async function openResource(id) {
+    const r = resources.find(x => x.id === id);
+    if (!r) return;
+
+    // Prefer URL — works across all devices
+    if (r.url) {
+      window.open(r.url, '_blank', 'noopener');
+      showToast('Opening link...');
+      return;
+    }
+
+    if (r.hasFile) {
+      try {
+        const record = await getFileFromDB(id);
+        if (!record || !record.blob) { showToast('File only available on the device that uploaded it. Add a URL for cross-device access.', true); return; }
+        const blob = record.blob;
+        const fileName = r.fileName || 'file';
+        const kind = detectFileKind(fileName);
+        if (kind === 'image' || kind === 'video' || kind === 'audio') {
+          const url = URL.createObjectURL(blob);
+          const win = window.open('', '_blank');
+          if (win) {
+            if (kind === 'image') win.document.write(`<title>${escapeHtml(r.title)}</title><body style="margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh;"><img src="${url}" style="max-width:100%;max-height:100vh;" /></body>`);
+            else if (kind === 'video') win.document.write(`<title>${escapeHtml(r.title)}</title><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;"><video src="${url}" controls autoplay style="max-width:100%;max-height:100vh;"></video></body>`);
+            else win.document.write(`<title>${escapeHtml(r.title)}</title><body style="margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh;color:#fff;font-family:sans-serif;"><div style="text-align:center;"><h2>${escapeHtml(r.title)}</h2><audio src="${url}" controls autoplay style="margin-top:1rem;width:400px;"></audio></div></body>`);
+          }
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = fileName;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 3000);
+        showToast(`Downloading ${fileName}...`);
+      } catch (e) {
+        showToast('Could not read local file', true);
+      }
+    } else if (r.content) {
+      openStepsModal(id, true);
+    } else {
+      showToast('No content available', true);
+    }
+  }
+
+  // ============================================================
+  //  STEPS MODAL
+  // ============================================================
+  function openStepsModal(id) {
+    const r = resources.find(x => x.id === id);
+    if (!r) return;
+    stepsModalTitle.innerHTML = `<i class="fas ${typeIcon(r.type, r.fileName)}" style="color:var(--accent);"></i> ${escapeHtml(r.title)}`;
+    let html = `<div class="resource-meta">
+      <span class="meta-pill"><i class="fas ${typeIcon(r.type, r.fileName)}"></i> ${typeLabel(r.type)}</span>
+      <span class="meta-pill"><i class="fas fa-calendar"></i> ${new Date(r.createdAt).toLocaleDateString()}</span>
+      ${r.fileName ? `<span class="meta-pill"><i class="fas fa-paperclip"></i> ${escapeHtml(r.fileName)}${r.fileSize ? ' · ' + formatBytes(r.fileSize) : ''}</span>` : ''}
+    </div>`;
+    if (r.description) html += `<p style="color:var(--text-secondary); margin-bottom:1.2rem; line-height:1.6;">${escapeHtml(r.description)}</p>`;
+    if ((r.type === 'prompt' || r.type === 'tutorial') && r.content) {
+      html += `<div style="margin-bottom:1.2rem;"><h4 style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); margin-bottom:0.6rem;">Content</h4><div style="background:var(--step-bg); padding:1rem; border-radius:var(--radius-sm); border-left:3px solid var(--accent); font-size:0.9rem; line-height:1.6; white-space:pre-wrap;">${escapeHtml(r.content)}</div></div>`;
+    }
+    if (r.steps && r.steps.length) {
+      html += `<h4 style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); margin-bottom:0.8rem;">How to use</h4><div class="steps-list">`;
+      r.steps.forEach((s, i) => { if (s.trim()) html += `<div class="step-item"><div class="step-num">${i + 1}</div><div class="step-text">${escapeHtml(s)}</div></div>`; });
+      html += `</div>`;
+    }
+    if (r.url || r.hasFile) {
+      let icon = 'fa-external-link-alt', label = 'Open resource';
+      if (r.url) { icon = 'fa-external-link-alt'; label = 'Open link'; }
+      else if (r.hasFile) { icon = 'fa-download'; label = 'Download file'; }
+      html += `<div style="margin-top:1.5rem;"><button class="btn btn-accent" style="width:100%;" onclick="window.__techmgOpen('${r.id}')"><i class="fas ${icon}"></i> ${label}</button></div>`;
+    }
+    stepsModalBody.innerHTML = html;
+    stepsModal.classList.add('open');
+  }
+  window.__techmgOpen = (id) => openResource(id);
+
+  // ============================================================
+  //  FILE DROP
+  // ============================================================
+  function setupFileDrop() {
+    fileDrop.addEventListener('click', () => fieldFile.click());
+    fileDrop.addEventListener('dragover', (e) => { e.preventDefault(); fileDrop.classList.add('dragover'); });
+    fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('dragover'));
+    fileDrop.addEventListener('drop', (e) => {
+      e.preventDefault(); fileDrop.classList.remove('dragover');
+      if (e.dataTransfer.files.length) handleFileSelect(e.dataTransfer.files[0]);
+    });
+    fieldFile.addEventListener('change', (e) => {
+      if (e.target.files.length) handleFileSelect(e.target.files[0]);
+    });
+  }
+  function handleFileSelect(file) {
+    if (file.size > WARN_SIZE) {
+      if (!confirm(`This file is ${formatBytes(file.size)}. Very large files may hit browser limits. Continue?`)) { fieldFile.value = ''; return; }
+    }
+    pendingFile = { blob: file, name: file.name, size: file.size, type: file.type };
+    renderSelectedFile();
+  }
+  function renderSelectedFile() {
+    if (!pendingFile) { fileSelectedInfo.innerHTML = ''; return; }
+    const kind = detectFileKind(pendingFile.name);
+    fileSelectedInfo.innerHTML = `<div class="file-selected"><i class="fas ${fileIcon(kind)}"></i><div style="flex:1; min-width:0;"><div style="font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(pendingFile.name)}</div><div style="font-size:0.75rem; color:var(--text-muted);">${formatBytes(pendingFile.size)}</div></div><button type="button" class="remove-file" title="Remove"><i class="fas fa-times"></i></button></div>`;
+    fileSelectedInfo.querySelector('.remove-file').addEventListener('click', () => {
+      pendingFile = null; fieldFile.value = ''; fileSelectedInfo.innerHTML = '';
+    });
+  }
+
+  // ============================================================
+  //  ADD / EDIT
+  // ============================================================
+  function openAddModal() {
+    editingId = null; pendingFile = null;
+    modalTitle.innerHTML = '<i class="fas fa-plus-circle" style="color:var(--accent);"></i> Add Resource';
+    fieldType.value = 'pdf';
+    fieldTitle.value = ''; fieldDesc.value = ''; fieldUrl.value = ''; fieldFile.value = ''; fieldContent.value = '';
+    fileSelectedInfo.innerHTML = '';
+    stepsContainer.innerHTML = ''; addStepRow('');
+    updateFormVisibility();
+    resourceModal.classList.add('open');
+  }
+  async function openEditModal(id) {
+    const r = resources.find(x => x.id === id);
+    if (!r) return;
+    editingId = id; pendingFile = null;
+    modalTitle.innerHTML = '<i class="fas fa-pen" style="color:var(--accent);"></i> Edit Resource';
+    fieldType.value = r.type;
+    fieldTitle.value = r.title || ''; fieldDesc.value = r.description || '';
+    fieldUrl.value = r.url || ''; fieldFile.value = ''; fieldContent.value = r.content || '';
+    stepsContainer.innerHTML = '';
+    if (r.steps && r.steps.length) r.steps.forEach(s => addStepRow(s)); else addStepRow('');
+    updateFormVisibility();
+    if (r.hasFile) {
+      try {
+        const record = await getFileFromDB(id);
+        if (record && record.blob) {
+          pendingFile = { blob: record.blob, name: r.fileName || 'file', size: r.fileSize || record.blob.size, type: record.blob.type };
+          renderSelectedFile();
+        }
+      } catch (e) { /* ignore */ }
+    } else fileSelectedInfo.innerHTML = '';
+    resourceModal.classList.add('open');
+  }
+  function updateFormVisibility() {
+    const type = fieldType.value;
+    if (type === 'pdf') {
+      urlGroup.style.display = 'block'; fileGroup.style.display = 'block'; contentGroup.style.display = 'none';
+      urlLabel.textContent = 'PDF URL (recommended — syncs across devices)';
+      urlHint.innerHTML = 'Paste a direct PDF link. <strong>Required for cross-device access.</strong>';
+      fileAcceptHint.textContent = 'PDF — local preview only';
+      fieldFile.accept = '.pdf,application/pdf';
+    } else if (type === 'link') {
+      urlGroup.style.display = 'block'; fileGroup.style.display = 'none'; contentGroup.style.display = 'none';
+      urlLabel.textContent = 'Website URL';
+      urlHint.textContent = 'Paste the link users should open.';
+    } else if (type === 'prompt' || type === 'tutorial') {
+      urlGroup.style.display = 'block'; fileGroup.style.display = 'none'; contentGroup.style.display = 'block';
+      urlLabel.textContent = 'Optional reference URL';
+      urlHint.textContent = 'Leave blank if content is in the text box.';
+    } else {
+      urlGroup.style.display = 'block'; fileGroup.style.display = 'block'; contentGroup.style.display = 'none';
+      urlLabel.textContent = 'File URL (recommended — syncs across devices)';
+      urlHint.innerHTML = 'Paste a download link. <strong>Required for cross-device access.</strong>';
+      fileAcceptHint.textContent = 'Any file type — local preview only';
+      fieldFile.accept = '*/*';
+    }
+  }
+  function addStepRow(value) {
+    const row = document.createElement('div');
+    row.className = 'step-input-row';
+    row.innerHTML = `<input type="text" placeholder="Step description..." value="${escapeHtml(value || '')}" /><button type="button" title="Remove step"><i class="fas fa-times"></i></button>`;
+    row.querySelector('button').addEventListener('click', () => row.remove());
+    stepsContainer.appendChild(row);
+  }
+  function collectSteps() {
+    const out = [];
+    stepsContainer.querySelectorAll('.step-input-row input').forEach(inp => { const v = inp.value.trim(); if (v) out.push(v); });
+    return out;
+  }
+
+  async function saveResource() {
+    const type = fieldType.value;
+    const title = fieldTitle.value.trim();
+    const desc = fieldDesc.value.trim();
+    const url = fieldUrl.value.trim();
+    const content = fieldContent.value.trim();
+    const steps = collectSteps();
+
+    if (!title) { showToast('Title is required', true); return; }
+    if (!desc) { showToast('Description is required', true); return; }
+
+    const id = editingId || uid();
+    let hasFile = false, fileName = null, fileSize = 0;
+
+    if (pendingFile && pendingFile.blob) {
+      try {
+        await saveFileToDB(id, pendingFile.blob, { name: pendingFile.name, size: pendingFile.size, type: pendingFile.type });
+        hasFile = true; fileName = pendingFile.name; fileSize = pendingFile.size;
+      } catch (e) {
+        showToast('Could not store local file preview', true);
+      }
+    }
+
+    if (editingId) {
+      const idx = resources.findIndex(x => x.id === editingId);
+      if (idx !== -1) {
+        const existing = resources[idx];
+        resources[idx] = { ...existing, type, title, description: desc, url, content, steps, hasFile: hasFile || existing.hasFile, fileName: fileName || existing.fileName, fileSize: fileSize || existing.fileSize || 0 };
+      }
+    } else {
+      resources.unshift({ id, type, title, description: desc, url, content, steps, hasFile, fileName, fileSize, createdAt: Date.now() });
+    }
+
+    // Save locally first (instant feedback)
+    saveToLocal();
+    closeResourceModal();
+    renderAll();
+
+    // Then sync to GitHub
+    if (SYNC_ENABLED) {
+      const ok = await syncUp();
+      if (ok) renderAll();
+    } else {
+      showToast('Saved locally only. Configure GitHub sync for cross-device.', true);
+    }
+  }
+  function closeResourceModal() {
+    resourceModal.classList.remove('open');
+    editingId = null; pendingFile = null;
+  }
+
+  // ============================================================
+  //  DELETE — sync to GitHub
+  // ============================================================
+  async function deleteResource(id) {
+    if (!confirm('Delete this resource permanently? This will sync to all devices.')) return;
+    try { await deleteFileFromDB(id); } catch (e) { /* ignore */ }
+    resources = resources.filter(r => r.id !== id);
+    bookmarks.delete(id);
+    saveToLocal();
+    renderAll();
+    if (SYNC_ENABLED) {
+      const ok = await syncUp();
+      if (ok) showToast('Deleted & synced to all devices');
+      else showToast('Deleted locally — sync failed. Click "Refresh from GitHub" to retry.', true);
+    } else {
+      showToast('Deleted locally only. Configure GitHub sync for cross-device.', true);
+    }
+  }
+
+  // ============================================================
+  //  ADMIN AUTH
+  // ============================================================
+  function getFailCount() { return parseInt(localStorage.getItem(FAIL_KEY) || '0', 10); }
+  function setFailCount(n) { localStorage.setItem(FAIL_KEY, String(n)); }
+  function getLockUntil() { return parseInt(localStorage.getItem(LOCK_KEY) || '0', 10); }
+  function setLockUntil(ts) { localStorage.setItem(LOCK_KEY, String(ts)); }
+  function isLocked() { return Date.now() < getLockUntil(); }
+
+  function updateLoginUI() {
+    const locked = isLocked();
+    const fails = getFailCount();
+    loginBtn.disabled = locked;
+    adminPassword.disabled = locked;
+    if (locked) {
+      const secs = Math.ceil((getLockUntil() - Date.now()) / 1000);
+      loginStatus.textContent = `Too many attempts. Try again in ${secs}s.`;
+      loginStatus.style.color = 'var(--danger)';
+      loginBtn.innerHTML = `<i class="fas fa-lock"></i> Locked (${secs}s)`;
+      clearInterval(updateLoginUI._t);
+      updateLoginUI._t = setInterval(() => {
+        if (!isLocked()) { clearInterval(updateLoginUI._t); loginStatus.textContent = ''; updateLoginUI(); }
+        else {
+          const s = Math.ceil((getLockUntil() - Date.now()) / 1000);
+          loginStatus.textContent = `Too many attempts. Try again in ${s}s.`;
+          loginBtn.innerHTML = `<i class="fas fa-lock"></i> Locked (${s}s)`;
+        }
+      }, 500);
+    } else {
+      loginBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Unlock Dashboard';
+      if (fails > 0) { loginStatus.textContent = `${MAX_ATTEMPTS - fails} attempt${MAX_ATTEMPTS - fails !== 1 ? 's' : ''} remaining.`; loginStatus.style.color = 'var(--warning)'; }
+      else loginStatus.textContent = '';
+    }
+  }
+
+  async function tryLogin() {
+    if (isLocked()) { updateLoginUI(); return; }
+    const input = adminPassword.value;
+    if (!input) { loginStatus.textContent = 'Please enter a password.'; loginStatus.style.color = 'var(--danger)'; return; }
+    loginBtn.disabled = true;
+    loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+    let ok = false;
+    try { ok = await verifyPassword(input); } catch (e) { ok = false; }
+    if (ok) {
+      isAdmin = true; setFailCount(0); setLockUntil(0);
+      adminPassword.value = '';
+      adminLogin.style.display = 'none';
+      adminDashboard.style.display = 'block';
+      adminLabel.textContent = 'Admin ✓';
+      adminToggle.classList.add('btn-accent');
+      loginStatus.textContent = '';
+      showToast('Welcome, admin');
+      // Pull latest from GitHub before rendering admin
+      if (SYNC_ENABLED) {
+        await syncDown();
+      }
+      renderAll();
+      renderAdmin();
+    } else {
+      const fails = getFailCount() + 1; setFailCount(fails);
+      if (fails >= MAX_ATTEMPTS) { setLockUntil(Date.now() + LOCK_DURATION_MS); setFailCount(0); showToast('Too many failed attempts. Locked 60s.', true); }
+      else showToast(`Incorrect password. ${MAX_ATTEMPTS - fails} left.`, true);
+      adminPassword.value = ''; adminPassword.focus();
+    }
+    updateLoginUI();
+  }
+
+  function exitAdmin() {
+    isAdmin = false;
+    adminDashboard.style.display = 'none';
+    adminLogin.style.display = 'block';
+    adminLabel.textContent = 'Admin';
+    adminToggle.classList.remove('btn-accent');
+    showAdminView(false);
+    updateLoginUI();
+    showToast('Admin mode off');
+  }
+  function showAdminView(on) {
+    publicView.style.display = on ? 'none' : 'block';
+    adminView.style.display = on ? 'block' : 'none';
+  }
+
+  // ============================================================
+  //  RENDER ALL
+  // ============================================================
+  function renderAll() {
+    renderPublic();
+    if (isAdmin) renderAdmin();
+  }
+
+  // ============================================================
+  //  EVENTS
+  // ============================================================
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    const isDark = document.body.classList.contains('dark');
+    themeIcon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+    saveTheme(isDark);
+  });
+
+  adminToggle.addEventListener('click', () => {
+    if (isAdmin) showAdminView(!adminView.style.display || adminView.style.display === 'none');
+    else { showAdminView(true); adminLogin.style.display = 'block'; adminDashboard.style.display = 'none'; updateLoginUI(); adminPassword.focus(); }
+  });
+
+  loginBtn.addEventListener('click', tryLogin);
+  adminPassword.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryLogin(); });
+  logoutBtn.addEventListener('click', exitAdmin);
+
+  refreshBtn.addEventListener('click', async () => {
+    if (!SYNC_ENABLED) { showToast('Sync not configured', true); return; }
+    refreshBtn.disabled = true;
+    refreshBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Refreshing...';
+    const ok = await syncDown();
+    refreshBtn.disabled = false;
+    refreshBtn.innerHTML = '<i class="fas fa-sync"></i> Refresh from GitHub';
+    if (ok) { renderAll(); renderAdmin(); showToast('Refreshed from GitHub'); }
+    else showToast('Refresh failed', true);
+  });
+
+  let searchTimer;
+  searchInput.addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => { currentSearch = searchInput.value.trim(); renderPublic(); }, 200);
+  });
+  filterSelect.addEventListener('change', () => { currentFilter = filterSelect.value; renderPublic(); });
+  sortSelect.addEventListener('change', () => { currentSort = sortSelect.value; renderPublic(); });
+  bookmarkFilterBtn.addEventListener('click', () => {
+    showBookmarksOnly = !showBookmarksOnly;
+    bookmarkFilterBtn.classList.toggle('btn-accent', showBookmarksOnly);
+    bookmarkFilterBtn.querySelector('i').className = showBookmarksOnly ? 'fas fa-bookmark' : 'far fa-bookmark';
+    renderPublic();
+  });
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const tab = btn.dataset.tab;
+      currentFilter = tab === 'all' ? 'all' : tab;
+      filterSelect.value = currentFilter;
+      renderPublic();
+    });
+  });
+
+  addResourceBtn.addEventListener('click', openAddModal);
+  closeModalBtn.addEventListener('click', closeResourceModal);
+  cancelModalBtn.addEventListener('click', closeResourceModal);
+  resourceModal.addEventListener('click', (e) => { if (e.target === resourceModal) closeResourceModal(); });
+  closeStepsBtn.addEventListener('click', () => stepsModal.classList.remove('open'));
+  stepsModal.addEventListener('click', (e) => { if (e.target === stepsModal) stepsModal.classList.remove('open'); });
+  fieldType.addEventListener('change', updateFormVisibility);
+  addStepBtn.addEventListener('click', () => addStepRow(''));
+  saveResourceBtn.addEventListener('click', saveResource);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { resourceModal.classList.remove('open'); stepsModal.classList.remove('open'); }
+  });
+
+  // ============================================================
+  //  INIT
+  // ============================================================
+  async function init() {
+    loadTheme();
+    loadFromLocal();
+    setupFileDrop();
+    try { await openDB(); } catch (e) { console.warn(e); }
+    await ensureAdminHash();
+    updateLoginUI();
+
+    // Show config warning if sync not enabled
+    if (!SYNC_ENABLED) {
+      configWarning.style.display = 'block';
+    }
+
+    // Fetch from GitHub on load (public visitors + admin)
+    if (SYNC_ENABLED) {
+      const ok = await syncDown();
+      if (ok) renderAll();
+    } else {
+      renderAll();
+    }
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
